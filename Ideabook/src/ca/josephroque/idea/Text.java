@@ -9,6 +9,7 @@ public class Text {
 	public static final String regex_AlphaNumeric = "[- a-zA-Z0-9]*";
 	public static final String regex_CommaSeparated = "[- a-zA-Z0-9!@#$%&.,+]*(, *[- a-zA-Z0-9!@#$%&.,+]*)*";
 	public static final String regex_IdeaName = "[- a-zA-Z0-9!@#$%&.,+]*";
+	public static final String regex_CommaSeparatedAndLower = "[- a-z0-9!@#$%&.,+]*(, *[- a-z0-9!@#$%&.,+]*)*";
 	
 	public static final int IDEA_NAME_MAXLENGTH = 32;
 

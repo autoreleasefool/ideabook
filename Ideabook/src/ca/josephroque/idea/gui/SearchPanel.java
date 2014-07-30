@@ -28,8 +28,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import ca.josephroque.idea.Assets;
-import ca.josephroque.idea.Data;
 import ca.josephroque.idea.Text;
+import ca.josephroque.idea.config.Category;
 import ca.josephroque.idea.config.Idea;
 import ca.josephroque.idea.config.Tag;
 
@@ -81,7 +81,7 @@ public class SearchPanel extends RefreshablePanel {
 		innerPanel.add(Box.createRigidArea(new Dimension(5,0)));
 		innerPanel.add(textSearchTerms);
 		
-		comboCategory = new JComboBox<String>(new DefaultComboBoxModel<String>(Data.getCategoryNamesArray()));
+		comboCategory = new JComboBox<String>(new DefaultComboBoxModel<String>(Category.getCategoryNamesArray()));
 		comboCategory.addItemListener(new ItemListener() {
 			public void itemStateChanged(ItemEvent event) {
 				if (event.getStateChange() == ItemEvent.SELECTED) {
@@ -162,7 +162,7 @@ public class SearchPanel extends RefreshablePanel {
 		
 		String ideaName = listSearchResults.getElementAt(curSelectedIndex);
 		String ideaCategory = ideaCategoryTree.get(ideaName);
-		Idea loadedIdea = Data.loadIdea(ideaName, ideaCategory);
+		Idea loadedIdea = Idea.loadIdea(ideaName, ideaCategory);
 		ViewPanel.setCurrentIdea(loadedIdea);
 		PanelManager.show(PanelManager.MENU_VIEW);
 	}
@@ -175,7 +175,7 @@ public class SearchPanel extends RefreshablePanel {
 		
 		String ideaName = listSearchResults.getElementAt(curSelectedIndex);
 		String ideaCategory = ideaCategoryTree.get(ideaName);
-		Idea loadedIdea = Data.loadIdea(ideaName, ideaCategory);
+		Idea loadedIdea = Idea.loadIdea(ideaName, ideaCategory);
 		EditPanel.setCurrentIdea(loadedIdea);
 		PanelManager.show(PanelManager.MENU_EDIT);
 	}
@@ -257,14 +257,14 @@ public class SearchPanel extends RefreshablePanel {
 	}
 
 	public void refresh() {
-		Iterator<String> categoryIterator = Data.getCategoryNamesIterator();
+		Iterator<String> categoryIterator = Category.getCategoryNamesIterator();
 		
 		ideaNameTree = new TreeSet<String>();
 		ideaCategoryTree = new TreeMap<String, String>();
-		Data.loadAllIdeaNames(ideaNameTree, ideaCategoryTree);
+		Idea.loadAllIdeaNames(ideaNameTree, ideaCategoryTree);
 		
 		tagTree = new TreeSet<Tag>();
-		Data.loadAllTags(tagTree);
+		Tag.loadAllTags(tagTree);
 		
 		searchResultsTree = new TreeSet<String>();
 		

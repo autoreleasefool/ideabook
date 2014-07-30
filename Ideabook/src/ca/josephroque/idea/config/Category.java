@@ -50,12 +50,7 @@ public class Category {
 			}
 		} else {
 			//Generates default categories and saves them
-			addCategoryName("Application", false);
-			addCategoryName("Novel", false);
-			addCategoryName("Other", false);
-			addCategoryName("Poetry", false);
-			addCategoryName("Short Story", false);
-			
+			addCategoryName("Miscellaneous", false);
 			saveCategoryNames();
 		}
 	}

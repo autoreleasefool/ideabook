@@ -5,7 +5,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -31,7 +35,7 @@ public class Idea {
 	private String name;
 	private String category;
 	private String body;
-	private String[] tags;
+	private List<String> tags;
 	
 	private Date created;
 	private Date modified;
@@ -42,7 +46,7 @@ public class Idea {
 		this.name = name;
 		this.category = category;
 		this.body = body;
-		this.tags = tags;
+		this.tags = tags == null ? new ArrayList<String>():Arrays.asList(tags);
 		this.created = created;
 		this.modified = modified;
 	}
@@ -54,7 +58,7 @@ public class Idea {
 	public Idea(String name, String category, String body, String[] tags, String created, String modified) {
 		this.name = name;
 		this.category = category;
-		this.tags = tags;
+		this.tags = tags == null ? new ArrayList<String>():Arrays.asList(tags);
 		this.body = body;
 		
 		try {
@@ -69,20 +73,38 @@ public class Idea {
 		}
 	}
 	
+	public Idea(Idea ideaCopy) {
+		this.name = ideaCopy.getName();
+		this.category = ideaCopy.getCategory();
+		this.body = ideaCopy.getBody();
+		this.tags = Arrays.asList(ideaCopy.getTagsArray());
+		
+		this.created = ideaCopy.getDateCreated();
+		this.modified = ideaCopy.getDateLastModified();
+	}
+	
 	public Date getDateCreated() {return created;}
 	public Date getDateLastModified() {return modified;}
 	public String getName() {return name;}
 	public String getCategory() {return category;}
 	public String getBody() {return body;}
-	public String[] getTags() {return tags;}
+	public List<String> getTags() {return tags;}
 	public boolean wasModified() {return wasModified;}
+	
+	public Iterator<String> getTagsIterator() {
+		return tags.iterator();
+	}
+	
+	public String[] getTagsArray() {
+		return (String[]) tags.toArray();
+	}
 	
 	public String getTagsCommaSeparated() {
 		String tagsWithCommas = "";
-		if (tags.length > 0) {
-			tagsWithCommas = tags[0];
-			for (int i = 1; i < tags.length; i++)
-				tagsWithCommas += ", " + tags[i];
+		if (tags.size() > 0) {
+			tagsWithCommas = tags.get(0);
+			for (int i = 1; i < tags.size(); i++)
+				tagsWithCommas += ", " + tags.get(i);
 		}
 		return tagsWithCommas;
 	}
@@ -106,7 +128,7 @@ public class Idea {
 	}
 	
 	public void setTags(String[] tags) {
-		this.tags = tags;
+		this.tags = Arrays.asList(tags);
 		modified();
 	}
 	
@@ -133,6 +155,24 @@ public class Idea {
 		wasModified = true;
 	}
 	
+	public static boolean editIdea(Idea oldIdea, Idea newIdea) {
+		File directory = new File(Data.getDefaultDirectory() + "/Ideabook/" + newIdea.getCategory());
+		directory.mkdirs();
+		
+		directory = new File(Data.getDefaultDirectory() + "/Ideabook/");
+		if (oldIdea.getName().equalsIgnoreCase(newIdea.getName())) {
+			File oldSaveFile = new File(Data.getDefaultDirectory() + "/Ideabook/" + oldIdea.getCategory() + "/" + oldIdea.getName() + ".idea");
+			oldSaveFile.delete();
+		} else if (Data.checkForDuplicateFilename(directory, newIdea.getName() + ".idea")) {
+			Notification.queueInformationNotification("An idea with this name already exists");
+			return false;
+		}
+		directory = null;
+		
+		File saveFile = new File(Data.getDefaultDirectory() + "/Ideabook/" + newIdea.getCategory() + "/" + newIdea.getName() + ".idea");
+		return saveIdeaToFile(newIdea, saveFile);
+	}
+	
 	public static boolean saveIdea(Idea idea) {
 		File directory = new File(Data.getDefaultDirectory() + "/Ideabook/" + idea.getCategory());
 		directory.mkdirs();
@@ -145,8 +185,13 @@ public class Idea {
 		directory = null;
 		
 		File saveFile = new File(Data.getDefaultDirectory() + "/Ideabook/" + idea.getCategory() + "/" + idea.getName() + ".idea");
-		if (saveFile.exists())
+		return saveIdeaToFile(idea, saveFile);
+	}
+	
+	private static boolean saveIdeaToFile(Idea idea, File saveFile) {
+		if (saveFile.exists()) {
 			saveFile.delete();
+		}
 		
 		Element ideaElement = new Element("idea");
 		Document doc = new Document(ideaElement);

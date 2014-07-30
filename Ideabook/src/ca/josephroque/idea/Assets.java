@@ -21,6 +21,7 @@ public class Assets {
 	public static Font fontRegencie = null;
 	
 	public static final Color backgroundPanelColor = new Color(110, 150, 200);
+	public static final Color backgroundPreviewTextFieldColor = new Color(100, 140, 190);
 	
 	public static void loadAssets() {
 		fontCaviarDreams = loadFont("CaviarDreams.ttf");

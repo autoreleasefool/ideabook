@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.Iterator;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -21,11 +22,11 @@ import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
 import ca.josephroque.idea.Assets;
-import ca.josephroque.idea.Data;
 import ca.josephroque.idea.Ideabook;
 import ca.josephroque.idea.Text;
 import ca.josephroque.idea.config.Category;
 import ca.josephroque.idea.config.Idea;
+import ca.josephroque.idea.config.Tag;
 
 public class SubmitPanel extends RefreshablePanel {
 
@@ -94,7 +95,7 @@ public class SubmitPanel extends RefreshablePanel {
 		innerControlPanel.add(label);
 		
 		textIdeaTags = new JTextField();
-		textIdeaTags.setDocument(new Text.PatternDocument(Text.regex_CommaSeparated));
+		textIdeaTags.setDocument(new Text.PatternDocument(Text.regex_CommaSeparatedAndLower));
 		textIdeaTags.setFont(Assets.fontRegencie.deriveFont(Assets.FONT_SIZE_DEFAULT));
 		innerControlPanel.add(Box.createRigidArea(new Dimension(5,0)));
 		innerControlPanel.add(textIdeaTags);
@@ -229,10 +230,10 @@ public class SubmitPanel extends RefreshablePanel {
 	private void createNewIdea() {
 		Idea newIdea = new Idea(textIdeaName.getText(), comboCategory.getItemAt(comboCategory.getSelectedIndex()), textAreaIdeaBody.getText(), textIdeaTags.getText().split(", *"), new java.util.Date());
 		
-		if (Data.saveIdea(newIdea)) {
-			String[] tags = newIdea.getTags();
-			for (int i = 0; i<tags.length; i++)
-				Data.addIdeaToTag(tags[i], newIdea);
+		if (Idea.saveIdea(newIdea)) {
+			Iterator<String> tags = newIdea.getTagsIterator();
+			while(tags.hasNext())
+				Tag.addIdeaToTag(tags.next(), newIdea);
 			PanelManager.show(PanelManager.MENU_MAIN);
 			Notification.queueInformationNotification("Success! New idea saved!");
 		}

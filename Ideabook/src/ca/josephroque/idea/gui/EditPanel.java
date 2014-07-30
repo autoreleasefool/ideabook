@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -18,10 +21,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import ca.josephroque.idea.Assets;
-import ca.josephroque.idea.Data;
 import ca.josephroque.idea.Ideabook;
 import ca.josephroque.idea.Text;
+import ca.josephroque.idea.config.Category;
 import ca.josephroque.idea.config.Idea;
+import ca.josephroque.idea.config.Tag;
 
 public class EditPanel extends RefreshablePanel {
 	
@@ -57,7 +61,7 @@ public class EditPanel extends RefreshablePanel {
 		textFieldIdeaName.setFont(Assets.fontRegencie.deriveFont(Assets.FONT_SIZE_DEFAULT));
 		namePanel.add(textFieldIdeaName);
 		
-		comboIdeaCategory = new JComboBox<String>(new DefaultComboBoxModel<String>(Data.getCategoryNamesArray()));
+		comboIdeaCategory = new JComboBox<String>(new DefaultComboBoxModel<String>(Category.getCategoryNamesArray()));
 		namePanel.add(Box.createRigidArea(new Dimension(5,0)));
 		namePanel.add(comboIdeaCategory);
 		
@@ -72,7 +76,7 @@ public class EditPanel extends RefreshablePanel {
 		tagPanel.add(label);
 		
 		textFieldIdeaTags = new JTextField();
-		textFieldIdeaTags.setDocument(new Text.PatternDocument(Text.regex_CommaSeparated));
+		textFieldIdeaTags.setDocument(new Text.PatternDocument(Text.regex_CommaSeparatedAndLower));
 		textFieldIdeaTags.setFont(Assets.fontRegencie.deriveFont(Assets.FONT_SIZE_DEFAULT));
 		tagPanel.add(textFieldIdeaTags);
 		
@@ -133,7 +137,39 @@ public class EditPanel extends RefreshablePanel {
 				return;
 		}
 		
+		Idea newIdea = new Idea(textFieldIdeaName.getText(),
+								comboIdeaCategory.getItemAt(comboIdeaCategory.getSelectedIndex()), 
+								textAreaIdeaBody.getText(),
+								textFieldIdeaTags.getText().split(", *"),
+								currentIdea.getDateCreated(),
+								new Date());
 		
+		if (Idea.editIdea(currentIdea, newIdea)) {
+			List<String> oldIdeaTags = currentIdea.getTags();
+			List<String> newIdeaTags = newIdea.getTags();
+			Iterator<String> tagIterator = null;
+			String curTag = null;
+			
+			tagIterator = currentIdea.getTagsIterator();
+			while (tagIterator.hasNext()) {
+				curTag = tagIterator.next();
+				if (!newIdeaTags.contains(curTag)) {
+					Tag.removeIdeaFromTag(curTag, newIdea);
+				}
+			}
+			
+			tagIterator = newIdea.getTagsIterator();
+			while (tagIterator.hasNext()) {
+				curTag = tagIterator.next();
+				if (!oldIdeaTags.contains(curTag)) {
+					Tag.addIdeaToTag(curTag, newIdea);
+				}
+			}
+			
+			currentIdea = newIdea;
+			refresh();
+			Notification.queueInformationNotification("This idea has been successfully saved");
+		}
 	}
 
 	public void refresh() {
