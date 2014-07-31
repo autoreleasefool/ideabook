@@ -154,16 +154,29 @@ public class Tag implements Comparable<Tag> {
 	public static void removeIdeaFromTag(String tagName, Idea idea) {
 		File tagFile = new File(Data.getDefaultDirectory() + "/Ideabook/config/tags/" + tagName + ".tag");
 		if (tagFile.exists()) {
+			System.out.println("here?");
 			try {
+				String ideaName = null;
 				SAXBuilder builder = new SAXBuilder();
 				Document doc = (Document) builder.build(tagFile);
 				Element rootNode = doc.getRootElement();
 				Element content = rootNode.getChild("content");
 				
 				List<Element> ideasInTag = content.getChildren("idea");
-				for (int i = 0; i<ideasInTag.size(); i++) {
-					if (ideasInTag.get(i).getText().compareToIgnoreCase(idea.getName()) == 0) {
+				int totalNumberOfIdeas = ideasInTag.size();
+				for (int i = 0; i<totalNumberOfIdeas; i++) {
+					ideaName = ideasInTag.get(i).getText().split(":")[0];
+					if (ideaName.compareToIgnoreCase(idea.getName()) == 0) {
 						content.removeContent(ideasInTag.get(i));
+						
+						if (totalNumberOfIdeas == 1) {
+							tagFile.delete();
+						} else {
+							XMLOutputter xmlOutput = new XMLOutputter();
+							xmlOutput.setFormat(Format.getPrettyFormat());
+							xmlOutput.output(doc, new FileWriter(tagFile));
+						}
+						
 						return;
 					}
 				}
@@ -202,11 +215,7 @@ public class Tag implements Comparable<Tag> {
 						return;
 					}
 				}
-				
-				int highestID = Integer.parseInt(content.getChild("totalideas").getText());
-				content.getChild("totalideas").setText(Integer.toString(highestID + 1));
 				Element tempElement = new Element("idea");
-				tempElement.setAttribute(new Attribute("id", Integer.toString(highestID + 1)));
 				tempElement.setText(idea.getName() + ":" + idea.getCategory());
 				content.addContent(tempElement);
 				
