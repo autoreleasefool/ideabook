@@ -82,16 +82,13 @@ public class Tag implements Comparable<Tag> {
 		Element idea;
 		
 		Iterator<String> ideaIterator = tag.iterator();
-		int counter = 0;
 		while (ideaIterator.hasNext()) {
 			String ideaName = ideaIterator.next();
 			
 			idea = new Element("idea");
-			idea.setAttribute(new Attribute("id", Integer.toString(++counter)));
 			idea.setText(ideaName + ":" + tag.getCategory(ideaName));
 			content.addContent(idea);
 		}
-		content.addContent(new Element("totalideas").setText(Integer.toString(counter)));
 		
 		doc.getRootElement().addContent(content);
 		
