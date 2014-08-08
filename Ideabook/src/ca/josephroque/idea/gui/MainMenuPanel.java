@@ -91,4 +91,8 @@ public class MainMenuPanel extends RefreshablePanel {
 	public void close() {
 		
 	}
+	
+	public void save() {
+		
+	}
 }

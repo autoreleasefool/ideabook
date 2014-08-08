@@ -8,4 +8,5 @@ public abstract class RefreshablePanel extends JPanel {
 
 	public abstract void refresh();
 	public abstract void close();
+	public abstract void save();
 }

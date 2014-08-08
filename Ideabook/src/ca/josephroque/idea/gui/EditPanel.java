@@ -190,6 +190,10 @@ public class EditPanel extends RefreshablePanel {
 		comboIdeaCategory.setSelectedIndex(0);
 	}
 	
+	public void save() {
+		
+	}
+	
 	public static void setCurrentIdea(Idea idea) {
 		currentIdea = idea;
 	}

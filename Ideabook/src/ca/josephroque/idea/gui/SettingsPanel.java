@@ -16,4 +16,8 @@ public class SettingsPanel extends RefreshablePanel {
 	public void close() {
 		
 	}
+	
+	public void save() {
+		
+	}
 }

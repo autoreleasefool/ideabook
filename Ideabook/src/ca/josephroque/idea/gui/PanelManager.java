@@ -53,21 +53,40 @@ public class PanelManager extends JPanel {
 		show(PanelManager.MENU_MAIN);
 	}
 	
+	public static String getCurrentPanel() {
+		return lastPanel;
+	}
+	
+	public static RefreshablePanel getPanel(String panelName) {
+		if (panelName == MENU_MAIN)
+			return mainMenuPanel;
+		else if (panelName == MENU_SUBMIT)
+			return submitPanel;
+		else if (panelName == MENU_VIEW)
+			return viewPanel;
+		else if (panelName == MENU_EDIT)
+			return editPanel;
+		else if (panelName == MENU_SETTINGS)
+			return settingsPanel;
+		else if (panelName == MENU_SEARCH)
+			return searchPanel;
+		else
+			return null;
+	}
+	
 	public static void show(String panelName) {
-		if (lastPanel != null) {
-			if (lastPanel == MENU_MAIN)
-				mainMenuPanel.close();
-			else if (lastPanel == MENU_SUBMIT)
-				submitPanel.close();
-			else if (lastPanel == MENU_VIEW)
-				viewPanel.close();
-			else if (lastPanel == MENU_EDIT)
-				editPanel.close();
-			else if (lastPanel == MENU_SETTINGS)
-				settingsPanel.close();
-			else if (lastPanel == MENU_SEARCH)
-				searchPanel.close();
-		}
+		if (lastPanel == MENU_MAIN)
+			mainMenuPanel.close();
+		else if (lastPanel == MENU_SUBMIT)
+			submitPanel.close();
+		else if (lastPanel == MENU_VIEW)
+			viewPanel.close();
+		else if (lastPanel == MENU_EDIT)
+			editPanel.close();
+		else if (lastPanel == MENU_SETTINGS)
+			settingsPanel.close();
+		else if (lastPanel == MENU_SEARCH)
+			searchPanel.close();
 		
 		if (MENU_MAIN == panelName) {
 			mainMenuPanel.refresh();

@@ -12,7 +12,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -163,12 +162,11 @@ public class Tag implements Comparable<Tag> {
 				int totalNumberOfIdeas = ideasInTag.size();
 				for (int i = 0; i<totalNumberOfIdeas; i++) {
 					ideaName = ideasInTag.get(i).getText().split(":")[0];
-					if (ideaName.compareToIgnoreCase(idea.getName()) == 0) {
-						content.removeContent(ideasInTag.get(i));
-						
+					if (ideaName.equalsIgnoreCase(idea.getName())) {
 						if (totalNumberOfIdeas == 1) {
 							tagFile.delete();
 						} else {
+							content.removeContent(ideasInTag.get(i));
 							XMLOutputter xmlOutput = new XMLOutputter();
 							xmlOutput.setFormat(Format.getPrettyFormat());
 							xmlOutput.output(doc, new FileWriter(tagFile));

@@ -289,4 +289,8 @@ public class SearchPanel extends RefreshablePanel {
 		searchResultsTree = null;
 		listSearchResults.clear();
 	}
+	
+	public void save() {
+		
+	}
 }

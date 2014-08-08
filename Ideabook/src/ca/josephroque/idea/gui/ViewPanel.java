@@ -179,6 +179,10 @@ public class ViewPanel extends RefreshablePanel {
 		setCurrentIdea(null);
 	}
 	
+	public void save() {
+		
+	}
+	
 	public static void setCurrentIdea(Idea idea) {
 		currentIdea = idea;
 	}

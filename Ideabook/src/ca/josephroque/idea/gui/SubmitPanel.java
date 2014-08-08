@@ -6,6 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Iterator;
 
 import javax.swing.Box;
@@ -21,7 +24,13 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+
 import ca.josephroque.idea.Assets;
+import ca.josephroque.idea.Data;
 import ca.josephroque.idea.Ideabook;
 import ca.josephroque.idea.Text;
 import ca.josephroque.idea.config.Category;
@@ -190,6 +199,60 @@ public class SubmitPanel extends RefreshablePanel {
 		
 	}
 	
+	public void save() {
+		String ideaNameText = textIdeaName.getText().trim();
+		String ideaTagText = textIdeaTags.getText().trim();
+		String ideaBodyText = textAreaIdeaBody.getText().trim();
+		
+		boolean saveIdeaName = ideaNameText != null && ideaNameText.length() > 0;
+		boolean saveIdeaTag = ideaTagText != null && ideaTagText.length() > 0;
+		boolean saveIdeaBody = ideaBodyText != null && ideaBodyText.length() > 0;
+		
+		if (saveIdeaName || saveIdeaTag || saveIdeaBody) {
+			File directory = new File(Data.getDefaultDirectory() + "/Ideabook/config");
+			directory.mkdirs();
+			directory = null;
+			
+			File saveFile = new File(Data.getDefaultDirectory() + "/Ideabook/config/submit.dat");
+			if (saveFile.exists())
+				saveFile.delete();
+			
+			Element dataElement = new Element("data");
+			Document doc = new Document(dataElement);
+			
+			Element content = new Element("content");
+			Element saveElement;
+			
+			if (saveIdeaName) {
+				saveElement = new Element("ideaname");
+				saveElement.setText(ideaNameText);
+				content.addContent(saveElement);
+			}
+			
+			if (saveIdeaTag) {
+				saveElement = new Element("ideatag");
+				saveElement.setText(ideaTagText);
+				content.addContent(saveElement);
+			}
+			
+			if (saveIdeaBody) {
+				saveElement = new Element("ideabody");
+				saveElement.setText(ideaBodyText);
+				content.addContent(saveElement);
+			}
+			
+			doc.getRootElement().addContent(content);
+			XMLOutputter xmlOutput = new XMLOutputter();
+			xmlOutput.setFormat(Format.getPrettyFormat());
+			
+			try {
+				xmlOutput.output(doc, new FileWriter(saveFile));
+			} catch (IOException io) {
+				Data.printErrorMessage(io);
+			}
+		}
+	}
+	
 	private class ControlActionListener implements ActionListener {
 		public void actionPerformed(ActionEvent event) {
 			if ("Create".equals(event.getActionCommand())) {
@@ -225,6 +288,18 @@ public class SubmitPanel extends RefreshablePanel {
 				PanelManager.show(PanelManager.MENU_MAIN);
 			}
 		}
+	}
+	
+	public void setIdeaName(String name) {
+		this.textIdeaName.setText(name);
+	}
+	
+	public void setIdeaTags(String tags) {
+		this.textIdeaTags.setText(tags);
+	}
+	
+	public void setIdeaBody(String body) {
+		this.textAreaIdeaBody.setText(body);
 	}
 	
 	private void createNewIdea() {
