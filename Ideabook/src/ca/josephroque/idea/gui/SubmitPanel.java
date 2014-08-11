@@ -1,6 +1,7 @@
 package ca.josephroque.idea.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Canvas;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,6 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
@@ -36,6 +38,7 @@ import ca.josephroque.idea.Text;
 import ca.josephroque.idea.config.Category;
 import ca.josephroque.idea.config.Idea;
 import ca.josephroque.idea.config.Tag;
+import ca.josephroque.idea.gui.components.IdeaCanvas;
 
 public class SubmitPanel extends RefreshablePanel {
 
@@ -56,24 +59,24 @@ public class SubmitPanel extends RefreshablePanel {
 		this.setLayout(new BorderLayout());
 		this.setBackground(Assets.backgroundPanelColor);
 		
-		JPanel innerPanel = new JPanel();
-		innerPanel.setBackground(Assets.backgroundPanelColor);
-		innerPanel.setLayout(new BorderLayout());
+		JPanel upperInfoPanel = new JPanel();
+		upperInfoPanel.setBackground(Assets.backgroundPanelColor);
+		upperInfoPanel.setLayout(new BorderLayout());
 		
-		JPanel innerControlPanel = new JPanel();
-		innerControlPanel.setBackground(Assets.backgroundPanelColor);
-		innerControlPanel.setLayout(new BoxLayout(innerControlPanel, BoxLayout.X_AXIS));
+		JPanel ideaNameAndCategoryPanel = new JPanel();
+		ideaNameAndCategoryPanel.setBackground(Assets.backgroundPanelColor);
+		ideaNameAndCategoryPanel.setLayout(new BoxLayout(ideaNameAndCategoryPanel, BoxLayout.X_AXIS));
 		
 		JLabel label = new JLabel("Idea:");
 		label.setFont(Assets.fontGravityBook.deriveFont(Assets.FONT_SIZE_DEFAULT));
-		innerControlPanel.add(Box.createRigidArea(new Dimension(5,0)));
-		innerControlPanel.add(label);
+		ideaNameAndCategoryPanel.add(Box.createRigidArea(new Dimension(5,0)));
+		ideaNameAndCategoryPanel.add(label);
 		
 		textIdeaName = new JTextField();
 		textIdeaName.setDocument(new Text.PatternDocument(Text.regex_IdeaName, Text.IDEA_NAME_MAXLENGTH));
 		textIdeaName.setFont(Assets.fontRegencie.deriveFont(Assets.FONT_SIZE_DEFAULT));
-		innerControlPanel.add(Box.createRigidArea(new Dimension(5,0)));
-		innerControlPanel.add(textIdeaName);
+		ideaNameAndCategoryPanel.add(Box.createRigidArea(new Dimension(5,0)));
+		ideaNameAndCategoryPanel.add(textIdeaName);
 		
 		comboCategory = new JComboBox<String>(new DefaultComboBoxModel<String>(Category.getCategoryNamesArray()));
 		comboCategory.addItem(SubmitPanel.STR_CATEGORY_NEW);
@@ -89,43 +92,60 @@ public class SubmitPanel extends RefreshablePanel {
 				}
 			}
 		});
-		innerControlPanel.add(Box.createRigidArea(new Dimension(5,0)));
-		innerControlPanel.add(comboCategory);
+		ideaNameAndCategoryPanel.add(Box.createRigidArea(new Dimension(5,0)));
+		ideaNameAndCategoryPanel.add(comboCategory);
 		
-		innerPanel.add(innerControlPanel, BorderLayout.NORTH);
+		upperInfoPanel.add(ideaNameAndCategoryPanel, BorderLayout.NORTH);
+		ideaNameAndCategoryPanel = null;
 		
-		innerControlPanel = new JPanel();
-		innerControlPanel.setBackground(Assets.backgroundPanelColor);
-		innerControlPanel.setLayout(new BoxLayout(innerControlPanel, BoxLayout.X_AXIS));
+		JPanel ideaTagsPanel = new JPanel();
+		ideaTagsPanel.setBackground(Assets.backgroundPanelColor);
+		ideaTagsPanel.setLayout(new BoxLayout(ideaTagsPanel, BoxLayout.X_AXIS));
 		
 		label = new JLabel("Tags:");
 		label.setFont(Assets.fontGravityBook.deriveFont(Assets.FONT_SIZE_DEFAULT));
-		innerControlPanel.add(Box.createRigidArea(new Dimension(5,0)));
-		innerControlPanel.add(label);
+		ideaTagsPanel.add(Box.createRigidArea(new Dimension(5,0)));
+		ideaTagsPanel.add(label);
 		
 		textIdeaTags = new JTextField();
 		textIdeaTags.setDocument(new Text.PatternDocument(Text.regex_CommaSeparatedAndLower));
 		textIdeaTags.setFont(Assets.fontRegencie.deriveFont(Assets.FONT_SIZE_DEFAULT));
-		innerControlPanel.add(Box.createRigidArea(new Dimension(5,0)));
-		innerControlPanel.add(textIdeaTags);
+		ideaTagsPanel.add(Box.createRigidArea(new Dimension(5,0)));
+		ideaTagsPanel.add(textIdeaTags);
 		
-		innerPanel.add(innerControlPanel, BorderLayout.SOUTH);
+		upperInfoPanel.add(ideaTagsPanel, BorderLayout.SOUTH);
+		ideaTagsPanel = null;
 		
-		this.add(innerPanel, BorderLayout.NORTH);
+		this.add(upperInfoPanel, BorderLayout.NORTH);
+		upperInfoPanel = null;
 		
-		innerPanel = new JPanel();
-		innerPanel.setBackground(Assets.backgroundPanelColor);
-		innerPanel.setLayout(new BorderLayout());
-		innerPanel.setBorder(new EmptyBorder(0, 5, 0, 5));
+		JPanel lowerConfigPanel = new JPanel();
+		lowerConfigPanel.setBackground(Assets.backgroundPanelColor);
+		lowerConfigPanel.setLayout(new BorderLayout());
+		
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		tabbedPane.setBorder(new EmptyBorder(0, 0, 0, 0));
+		
+		/*JPanel ideaBodyPanel = new JPanel();
+		ideaBodyPanel.setBackground(Assets.backgroundPanelColor);
+		ideaBodyPanel.setBorder(new EmptyBorder(0,5, 0, 5));*/
 		
 		textAreaIdeaBody = new JTextArea();
 		textAreaIdeaBody.setLineWrap(true);
 		textAreaIdeaBody.setWrapStyleWord(true);
 		textAreaIdeaBody.setFont(Assets.fontRegencie.deriveFont(Assets.FONT_SIZE_DEFAULT));
-		innerPanel.add(new JScrollPane(textAreaIdeaBody), BorderLayout.CENTER);
+		//ideaBodyPanel.add(new JScrollPane(textAreaIdeaBody), BorderLayout.CENTER);
 		
-		innerControlPanel = new JPanel();
-		innerControlPanel.setBackground(Assets.backgroundPanelColor);
+		tabbedPane.addTab("Text", null, new JScrollPane(textAreaIdeaBody), "Plain text to describe the idea");
+		
+		Canvas ideaGraphicsCanvas = new IdeaCanvas();
+		tabbedPane.addTab("Graphics", null, ideaGraphicsCanvas, "Visuals to illustrate the idea");
+		
+		lowerConfigPanel.add(tabbedPane, BorderLayout.CENTER);
+		tabbedPane = null;
+		
+		JPanel controlButtonPanel = new JPanel();
+		controlButtonPanel.setBackground(Assets.backgroundPanelColor);
 		
 		ActionListener controlListener = new ControlActionListener();
 		
@@ -134,18 +154,20 @@ public class SubmitPanel extends RefreshablePanel {
 		button.setFocusPainted(false);
 		button.setActionCommand("Create");
 		button.addActionListener(controlListener);
-		innerControlPanel.add(button);
+		controlButtonPanel.add(button);
 		
 		button = new JButton("cancel");
 		button.setFont(Assets.fontCaviarDreams.deriveFont(Assets.FONT_SIZE_DEFAULT));
 		button.setFocusPainted(false);
 		button.setActionCommand("Cancel");
 		button.addActionListener(controlListener);
-		innerControlPanel.add(button);
+		controlButtonPanel.add(button);
 		
-		innerPanel.add(innerControlPanel, BorderLayout.SOUTH);
+		lowerConfigPanel.add(controlButtonPanel, BorderLayout.SOUTH);
+		controlButtonPanel = null;
 		
-		this.add(innerPanel, BorderLayout.CENTER);
+		this.add(lowerConfigPanel, BorderLayout.CENTER);
+		lowerConfigPanel = null;
 	}
 	
 	private void promptNewCategory() {

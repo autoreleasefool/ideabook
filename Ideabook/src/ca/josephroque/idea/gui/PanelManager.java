@@ -5,6 +5,8 @@ import java.awt.Dimension;
 
 import javax.swing.JPanel;
 
+import ca.josephroque.idea.Data;
+
 public class PanelManager extends JPanel {
 
 	private static final long serialVersionUID = 1L;
@@ -51,6 +53,8 @@ public class PanelManager extends JPanel {
 		add(searchPanel, PanelManager.MENU_SEARCH);
 		
 		show(PanelManager.MENU_MAIN);
+		
+		Data.checkForUnsavedData();
 	}
 	
 	public static String getCurrentPanel() {

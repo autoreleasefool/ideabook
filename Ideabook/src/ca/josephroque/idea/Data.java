@@ -31,7 +31,9 @@ public class Data {
 	
 	public static void loadData() {
 		Category.loadCategoryNames();
-		
+	}
+	
+	public static void checkForUnsavedData() {
 		File submitPanelSaveFile = new File(Data.getDefaultDirectory() + "/Ideabook/config/submit.dat");
 		if (submitPanelSaveFile.exists()) {
 			int responseToPrompt = JOptionPane.showConfirmDialog(Ideabook.getFrame(),
@@ -40,6 +42,7 @@ public class Data {
 																JOptionPane.YES_NO_OPTION,
 																JOptionPane.INFORMATION_MESSAGE);
 			if (responseToPrompt != JOptionPane.YES_OPTION) {
+				submitPanelSaveFile.delete();
 				return;
 			}
 			
@@ -95,6 +98,8 @@ public class Data {
 			} catch (SAXException | ParserConfigurationException | IOException ex) {
 				Data.printErrorMessage(ex);
 			}
+			
+			submitPanelSaveFile.delete();
 		}
 	}
 	
