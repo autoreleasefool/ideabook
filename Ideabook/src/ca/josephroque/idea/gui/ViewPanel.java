@@ -13,25 +13,45 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 import ca.josephroque.idea.Assets;
 import ca.josephroque.idea.config.Idea;
 
+/**
+ * <code>RefreshablePanel</code> which displays the contents of an
+ * idea to the user in non-editable fields.
+ * 
+ * @author Joseph Roque
+ * @since 2014-07-08
+ */
 public class ViewPanel extends RefreshablePanel {
 
+	/** Default serialVersionUID */
 	private static final long serialVersionUID = 1L;
 	
+	/** The <code>Idea</code> to be viewed by the user */
 	private static Idea currentIdea = null;
+	/** A String which represents unavailable information */
 	private static final String UNAVAILABLE = "Information unavailable.";
 	
+	/** Label to display the <code>Idea</code> object's name */
 	private JLabel labelIdeaName;
+	/** Label to display the <code>Idea</code> object's category */
 	private JLabel labelIdeaCategory;
+	/** Label to display the date the <code>Idea</code> object was created */
 	private JLabel labelIdeaDateCreated;
+	/** Label to display the date the <code>Idea</code> object was last modified */
 	private JLabel labelIdeaDateModified;
-	private JTextField textFieldIdeaTags;
+	/** Label to display the <code>Idea</code> object's tags */
+	private JLabel labelIdeaTags;
+	/** Text area to display the <code>Idea</code> object's description */
 	private JTextArea textAreaIdeaBody;
 	
+	/**
+	 * Default constructor. Creates a layout for the various labels
+	 * to be displayed to the user, along with two buttons. One is 
+	 * an 'edit' button and the other is a 'close' button.
+	 */
 	public ViewPanel() {
 		super();
 		this.setLayout(new BorderLayout());
@@ -66,11 +86,10 @@ public class ViewPanel extends RefreshablePanel {
 		label.setFont(Assets.fontGravityBook.deriveFont(Assets.FONT_SIZE_DEFAULT));
 		tagPanel.add(label);
 		
-		textFieldIdeaTags = new JTextField();
-		textFieldIdeaTags.setFont(Assets.fontRegencie.deriveFont(Assets.FONT_SIZE_DEFAULT));
-		textFieldIdeaTags.setEditable(false);
-		textFieldIdeaTags.setText(UNAVAILABLE);
-		tagPanel.add(textFieldIdeaTags);
+		labelIdeaTags = new JLabel();
+		labelIdeaTags.setFont(Assets.fontGravityBook.deriveFont(Assets.FONT_SIZE_DEFAULT));
+		labelIdeaTags.setText(UNAVAILABLE);
+		tagPanel.add(labelIdeaTags);
 		
 		infoPanel.add(tagPanel, BorderLayout.NORTH);
 		
@@ -128,7 +147,7 @@ public class ViewPanel extends RefreshablePanel {
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 		buttonPanel.add(Box.createHorizontalGlue());
 		
-		JButton btnClose = new JButton("Close Idea");
+		JButton btnClose = new JButton("close");
 		btnClose.setFont(Assets.fontCaviarDreams.deriveFont(Assets.FONT_SIZE_DEFAULT));
 		btnClose.setFocusPainted(false);
 		btnClose.addActionListener(new ActionListener() {
@@ -138,7 +157,7 @@ public class ViewPanel extends RefreshablePanel {
 		});
 		buttonPanel.add(btnClose);
 		
-		JButton btnEdit = new JButton("Edit Idea");
+		JButton btnEdit = new JButton("edit");
 		btnEdit.setFont(Assets.fontCaviarDreams.deriveFont(Assets.FONT_SIZE_DEFAULT));
 		btnEdit.setFocusPainted(false);
 		btnEdit.addActionListener(new ActionListener() {
@@ -156,6 +175,11 @@ public class ViewPanel extends RefreshablePanel {
 		this.add(lowerPanel, BorderLayout.SOUTH);
 	}
 
+	/**
+	 * Sets the text of the labels to the relevant values provided
+	 * by <code>currentIdea</code>
+	 */
+	@Override
 	public void refresh() {
 		if (currentIdea == null) {
 			return;
@@ -165,24 +189,37 @@ public class ViewPanel extends RefreshablePanel {
 		labelIdeaCategory.setText(currentIdea.getCategory());
 		labelIdeaDateCreated.setText(currentIdea.getDateCreatedFormatted());
 		labelIdeaDateModified.setText(currentIdea.getDateLastModifiedFormatted());
-		textFieldIdeaTags.setText(currentIdea.getTagsCommaSeparated());
+		labelIdeaTags.setText(currentIdea.getTagsCommaSeparated());
 		textAreaIdeaBody.setText(currentIdea.getBody());
 	}
 	
+	/**
+	 * Sets the text of the labels to <code>UNAVAILABLE</code>.
+	 */
+	@Override
 	public void close() {
 		labelIdeaName.setText(UNAVAILABLE);
 		labelIdeaCategory.setText(UNAVAILABLE);
 		labelIdeaDateCreated.setText(UNAVAILABLE);
 		labelIdeaDateModified.setText(UNAVAILABLE);
-		textFieldIdeaTags.setText(UNAVAILABLE);
+		labelIdeaTags.setText(UNAVAILABLE);
 		textAreaIdeaBody.setText(UNAVAILABLE);
 		setCurrentIdea(null);
 	}
 	
+	/**
+	 * Does nothing.
+	 */
+	@Override
 	public void save() {
 		
 	}
 	
+	/**
+	 * Sets the current idea which the user will view.
+	 * 
+	 * @param idea the new value for <code>currentIdea</code>
+	 */
 	public static void setCurrentIdea(Idea idea) {
 		currentIdea = idea;
 	}

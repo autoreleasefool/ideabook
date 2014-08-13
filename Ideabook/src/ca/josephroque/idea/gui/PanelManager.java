@@ -5,32 +5,58 @@ import java.awt.Dimension;
 
 import javax.swing.JPanel;
 
-import ca.josephroque.idea.Data;
-
+/**
+ * Manages the panels which the application switches between
+ * as the user traverses the menus and features.
+ * 
+ * @author Joseph Roque
+ * @since 2014-06-01
+ *
+ */
 public class PanelManager extends JPanel {
 
+	/** Default serialVersionUID */
 	private static final long serialVersionUID = 1L;
 	
+	/** String to represent the main menu */
 	public static final String MENU_MAIN = "Main Menu";
+	/** String to represent the new idea menu */
 	public static final String MENU_SUBMIT = "Submit";
+	/** String to represent the panel which display's an <code>Idea</code> objects data */
 	public static final String MENU_VIEW = "View";
+	/** String to represent the edit idea menu */
 	public static final String MENU_EDIT = "Edit";
+	/** String to represent the settings menu */
 	public static final String MENU_SETTINGS = "Settings";
+	/** String to represent the search menu */
 	public static final String MENU_SEARCH = "Search";
 	
+	/** <code>CardLayout</code> object which organizes the panels */
 	private static CardLayout cardLayout = null;
+	/** An instance of this class */
 	private static PanelManager instance = null;
 	
+	/** The main menu panel */
 	private static RefreshablePanel mainMenuPanel = null;
+	/** The new idea panel */
 	private static RefreshablePanel submitPanel = null;
+	/** The view idea panel */
 	private static RefreshablePanel viewPanel = null;
+	/** The edit idea panel */
 	private static RefreshablePanel editPanel = null;
+	/** The settings menu panel */
 	private static RefreshablePanel settingsPanel = null;
+	/** The search menu panel */
 	private static RefreshablePanel searchPanel = null;
 	
+	/** The most recently shown panel */
 	private static String lastPanel = null;
 
-	public PanelManager() {
+	/**
+	 * Initializes this object by creating new instances of all the
+	 * panels and adding them to a <code>CardLayout</code>.
+	 */
+	private PanelManager() {
 		super();
 		instance = this;
 		cardLayout = new CardLayout();
@@ -53,14 +79,33 @@ public class PanelManager extends JPanel {
 		add(searchPanel, PanelManager.MENU_SEARCH);
 		
 		show(PanelManager.MENU_MAIN);
-		
-		Data.checkForUnsavedData();
 	}
 	
+	/**
+	 * Creates an instance of this object, if one does not already exist,
+	 * and returns it.
+	 * @return the value of <code>instance</code>
+	 */
+	public static PanelManager getInstance() {
+		if (instance == null ) {
+			instance = new PanelManager();
+		}
+		return instance;
+	}
+	
+	/**
+	 * Returns the String which represents the most recently shown panel.
+	 * @return the value of <code>lastPanel</code>
+	 */
 	public static String getCurrentPanel() {
 		return lastPanel;
 	}
 	
+	/**
+	 * Returns the panel which corresponds to the provided String.
+	 * @param panelName the panel to return
+	 * @return the panel which corresponds to <code>panelName</code>
+	 */
 	public static RefreshablePanel getPanel(String panelName) {
 		if (panelName == MENU_MAIN)
 			return mainMenuPanel;
@@ -78,6 +123,15 @@ public class PanelManager extends JPanel {
 			return null;
 	}
 	
+	/**
+	 * Calls the close method on the panel represented by <code>lastPanel</code>,
+	 * if there is one, then calls refresh on the panel represented by <code>panelName</code>
+	 * and shows it.
+	 * 
+	 * @param panelName the panel to be shown
+	 * @see ca.josephroque.idea.gui.RefreshablePanel#close()
+	 * @see ca.josephroque.idea.gui.RefreshablePanel#refresh()
+	 */
 	public static void show(String panelName) {
 		if (lastPanel == MENU_MAIN)
 			mainMenuPanel.close();

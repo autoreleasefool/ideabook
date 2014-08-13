@@ -14,10 +14,25 @@ import javax.swing.JPanel;
 
 import ca.josephroque.idea.Assets;
 
+/**
+ * <code>RefreshablePanel</code> which displays a master set of options
+ * available to a user.
+ * <p>
+ * These options include creating an idea, searching for an existing idea
+ * and a settings menu.
+ * 
+ * @author Joseph Roque
+ * @since 2014-05-30
+ */
 public class MainMenuPanel extends RefreshablePanel {
 
+	/** Default serialVersionUID */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Initializes the panel with a label to display the application's
+	 * name and a list of buttons for the user to interact with.
+	 */
 	public MainMenuPanel() {
 		super();
 		this.setLayout(new BorderLayout());
@@ -84,14 +99,26 @@ public class MainMenuPanel extends RefreshablePanel {
 		this.add(innerPanel, BorderLayout.CENTER);
 	}
 	
+	/**
+	 * Does nothing.
+	 */
+	@Override
 	public void refresh() {
 		
 	}
 	
+	/**
+	 * Does nothing.
+	 */
+	@Override
 	public void close() {
 		
 	}
 	
+	/**
+	 * Does nothing.
+	 */
+	@Override
 	public void save() {
 		
 	}

@@ -24,30 +24,62 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import ca.josephroque.idea.Data;
 
+/**
+ * A Tag object is made up of a name and a set of Idea objects. These
+ * Idea objects are ideas which the user has created and 'tagged' with
+ * the corresponding name of this tag.
+ * 
+ * @author Joseph Roque
+ * @since 2014-06-20
+ */
 public class Tag implements Comparable<Tag> {
 	
+	/** An id to identify the Tag */
 	private String id;
+	/** The set of ideas which are 'tagged' with the id */
 	private TreeSet<String> ideas;
+	/** The corresponding category of each idea */
 	private TreeMap<String, String> ideaCategories;
 	
+	/**
+	 * Initializes a new Tag with the provided id
+	 * @param id the id of the tag
+	 */
 	public Tag(String id) {
 		this.id = id;
 		ideas = new TreeSet<String>();
 		ideaCategories = new TreeMap<String, String>();
 	}
 	
-	public Iterator<String> iterator() {
+	/**
+	 * Returns an iterator for the set of ideas
+	 * @return ideas.iterator()
+	 */
+	public Iterator<String> ideaIterator() {
 		return ideas.iterator();
 	}
 
+	/**
+	 * Returns the id of the Tag
+	 * @return the value of <code>id</code>
+	 */
 	public String getID() {
 		return id;
 	}
 
+	/**
+	 * Compares the ids of both Tag objects
+	 */
+	@Override
 	public int compareTo(Tag other) {
 		return id.compareTo(other.id);
 	}
 	
+	/**
+	 * Returns true if <code>other</code> represents a Tag
+	 * and the ids are equal, false otherwise.
+	 */
+	@Override
 	public boolean equals(Object other) {
 		if (other != null && other instanceof Tag) {
 			Tag o = (Tag) other;
@@ -56,15 +88,37 @@ public class Tag implements Comparable<Tag> {
 		return false;
 	}
 	
-	public void addIdea(String idea, String category) {
+	/**
+	 * Adds an idea to <code>ideas</code> and its category to <code>ideaCategories</code>
+	 * 
+	 * @param idea the idea to be added
+	 * @param category the category of the idea being added
+	 * @throws IllegalArgumentException if either parameter is null
+	 */
+	public void addIdea(String idea, String category) throws IllegalArgumentException {
+		if (idea == null || category == null) {
+			throw new IllegalArgumentException("idea and category cannot be null");
+		}
 		ideas.add(idea);
 		ideaCategories.put(idea, category);
 	}
 	
+	/**
+	 * Returns the category corresponding to the given idea, from <code>ideaCategories</code>.
+	 * @param idea the idea to get the category for
+	 * @return ideaCategories.get(idea);
+	 */
 	public String getCategory(String idea) {
 		return ideaCategories.get(idea);
 	}
 	
+	/**
+	 * Saves the given Tag to a file, formatted as an XML document. The document contains
+	 * all of the Tag's ideas and categories.
+	 * 
+	 * @param tag the tag to be saved
+	 * @return true if the tag was successfully saved, false otherwise
+	 */
 	public static boolean saveTag(Tag tag) {
 		File directory = new File(Data.getDefaultDirectory() + "/Ideabook/config/tags");
 		directory.mkdirs();
@@ -80,7 +134,7 @@ public class Tag implements Comparable<Tag> {
 		Element content = new Element("content");
 		Element idea;
 		
-		Iterator<String> ideaIterator = tag.iterator();
+		Iterator<String> ideaIterator = tag.ideaIterator();
 		while (ideaIterator.hasNext()) {
 			String ideaName = ideaIterator.next();
 			
@@ -104,6 +158,13 @@ public class Tag implements Comparable<Tag> {
 		return true;
 	}
 	
+	/**
+	 * Loads a Tag from a file corresponding to the given name of the tag. Creates
+	 * and returns a Tag object from the file.
+	 * 
+	 * @param tagName the tag to be loaded
+	 * @return a new Tag object with the ideas and categories listed in the file
+	 */
 	public static Tag loadTag(String tagName) {
 		final Tag tag = new Tag(tagName);
 		File loadFile = new File(Data.getDefaultDirectory() + "/Ideabook/config/tags/" + tagName + ".tag");
@@ -147,6 +208,32 @@ public class Tag implements Comparable<Tag> {
 		return tag;
 	}
 	
+	/**
+	 * Loads the names of all the tags created by the user and adds them to
+	 * the given <code>TreeSet</code> object.
+	 * 
+	 * @param tagTree lists the names of all of the tags found
+	 * @see ca.josephroque.idea.Data#getDefaultDirectory()
+	 */
+	public static void loadAllTags(TreeSet<Tag> tagTree) {
+		File directory = new File(Data.getDefaultDirectory() + "/Ideabook/config/tags");
+		if (directory.exists()) {
+			File[] listOfTags = directory.listFiles();
+			for (File f:listOfTags) {
+				if (f.getName().endsWith(".tag")) {
+					tagTree.add(loadTag(f.getName().substring(0,f.getName().lastIndexOf("."))));
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Removes the element from the Tag's XML document which corresponds to the
+	 * given idea.
+	 * 
+	 * @param tagName the tag to delete the idea from
+	 * @param idea the idea to be deleted
+	 */
 	public static void removeIdeaFromTag(String tagName, Idea idea) {
 		File tagFile = new File(Data.getDefaultDirectory() + "/Ideabook/config/tags/" + tagName + ".tag");
 		if (tagFile.exists()) {
@@ -181,16 +268,13 @@ public class Tag implements Comparable<Tag> {
 		}
 	}
 	
-	public static void loadAllTags(TreeSet<Tag> tagTree) {
-		File directory = new File(Data.getDefaultDirectory() + "/Ideabook/config/tags");
-		if (directory.exists()) {
-			File[] listOfTags = directory.listFiles();
-			for (File f:listOfTags) {
-				tagTree.add(loadTag(f.getName().substring(0,f.getName().lastIndexOf("."))));
-			}
-		}
-	}
-	
+	/**
+	 * Adds an element to the Tag's XML document with the given Idea object's name
+	 * value and category.
+	 * 
+	 * @param tagName the tag to add the idea to
+	 * @param idea the idea to be added
+	 */
 	public static void addIdeaToTag(String tagName, Idea idea) {
 		File directory = new File(Data.getDefaultDirectory() + "/Ideabook/config/tags");
 		directory.mkdirs();

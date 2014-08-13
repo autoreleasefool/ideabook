@@ -12,10 +12,25 @@ import java.util.TreeSet;
 import ca.josephroque.idea.Data;
 import ca.josephroque.idea.gui.Notification;
 
+/**
+ * Static methods relevant to creating and loading categories
+ * which organize the user's ideas.
+ * 
+ * @author Joseph Roque
+ * @since 2014-07-26
+ */
 public class Category {
 
+	/** The current list of category names used by the application */
 	private static TreeSet<String> categoryNames = new TreeSet<String>();
 	
+	/** Maximum length of a category name */
+	public static final int CATEGORY_MAX_LENGTH = 16;
+	
+	/**
+	 * Loads existing categories from a file which lists their names. If the file
+	 * does not exist, a default set of categories is generated for the user.
+	 */
 	public static void loadCategoryNames() {
 		File fileCategory = new File(Data.getDefaultDirectory() + "/Ideabook/config/categories.inf");
 		BufferedReader reader = null;
@@ -55,6 +70,10 @@ public class Category {
 		}
 	}
 	
+	/**
+	 * Saves the current set of category names to a file so the application can
+	 * easily recognize and load them the next time it is run.
+	 */
 	private static void saveCategoryNames() {
 		File directory = new File(Data.getDefaultDirectory() + "/Ideabook/config");
 		directory.mkdirs();
@@ -84,16 +103,36 @@ public class Category {
 		}
 	}
 	
+	/**
+	 * Creates an array of String objects from <code>categoryNames</code> and returns it.
+	 * 
+	 * @return an array of String objects containing the current category names
+	 */
 	public static String[] getCategoryNamesArray() {
 		String[] names = new String[categoryNames.size()];
 		categoryNames.toArray(names);
 		return names;
 	}
 	
+	/**
+	 * Returns an iterator from <code>categoryNames</code>
+	 * @return {@link java.util.TreeSet#iterator()} from <code>categoryNames</code>
+	 */
 	public static Iterator<String> getCategoryNamesIterator() {
 		return categoryNames.iterator();
 	}
 	
+	/**
+	 * If the category does not already exist, then it is added to <code>categoryNames</code>
+	 * and the method returns true, false otherwise. If <code>shouldSave</code> is true then
+	 * the current set of categories is saved to a text file.
+	 * 
+	 * @param newCategory name of the new category to be added
+	 * @param shouldSave indicates whether the new list of categories should be saved
+	 * @return true if the category did not already exist and was added, false otherwise
+	 * 
+	 * @see ca.josephroque.idea.config.Category#saveCategoryNames()
+	 */
 	public static boolean addCategoryName(String newCategory, boolean shouldSave) {
 		Iterator<String> categoryIterator = categoryNames.iterator();
 		while (categoryIterator.hasNext()) {
@@ -111,14 +150,24 @@ public class Category {
 			}
 		}
 		
-		categoryNames.add(newCategory);
+		boolean success = categoryNames.add(newCategory);
 		
-		if (shouldSave)
+		if (shouldSave && success) {
 			saveCategoryNames();
+		}
 		
-		return true;
+		return success;
 	}
 	
+	/**
+	 * If the category specified by <code>categoryToDelete</code> exists, then the category
+	 * is removed from <code>categoryNames</code> and the corresponding directory in the
+	 * application's data is cleared and deleted. This also deletes any subsequent ideas
+	 * which are saved in the category.
+	 * 
+	 * @param categoryToDelete name of the category to be deleted
+	 * @return true if the category was successfully deleted or did not exist, false otherwise
+	 */
 	public static boolean deleteCategoryName(String categoryToDelete) {
 		Iterator<String> categoryIterator = categoryNames.iterator();
 		String comparator;

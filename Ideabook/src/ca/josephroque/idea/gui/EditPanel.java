@@ -27,18 +27,39 @@ import ca.josephroque.idea.config.Category;
 import ca.josephroque.idea.config.Idea;
 import ca.josephroque.idea.config.Tag;
 
+/**
+ * <code>RefreshablePanel</code> which displays an idea and its contents
+ * in <code>JTextField</code> objects, etc. for the user to edit and
+ * save their changes to a previously existing {@link ca.josephroque.idea.config.Idea}.
+ * 
+ * @author Joseph Roque
+ * @since 2014-07-08
+ */
 public class EditPanel extends RefreshablePanel {
 	
+	/** Default serialVersionUID */
 	private static final long serialVersionUID = 1L;
 	
+	/** String to indicate unavailable information */
 	private static final String UNAVAILABLE = "Information Unavailable";
+	/** The idea being edited by the user */
 	private static Idea currentIdea = null;
 	
+	/** Input field for the idea's name */
 	private JTextField textFieldIdeaName = null;
+	/** Input field for the idea's tags */
 	private JTextField textFieldIdeaTags = null;
+	/** Input field for the idea's description */
 	private JTextArea textAreaIdeaBody = null;
+	/** Drop down list for the idea's category */
 	private JComboBox<String> comboIdeaCategory = null;
 	
+	/**
+	 * Initializes the panel and its layout.
+	 * <p>
+	 * Places the text fields and labels to identify them, along with
+	 * buttons to save or cancel the editing of an idea.
+	 */
 	public EditPanel() {
 		super();
 		this.setBackground(Assets.backgroundPanelColor);
@@ -93,7 +114,7 @@ public class EditPanel extends RefreshablePanel {
 		buttonPanel.setBackground(Assets.backgroundPanelColor);
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 		
-		JButton btnSave = new JButton("Save Changes");
+		JButton btnSave = new JButton("save");
 		btnSave.setFont(Assets.fontCaviarDreams.deriveFont(Assets.FONT_SIZE_DEFAULT));
 		btnSave.setFocusPainted(false);
 		btnSave.addActionListener(new ActionListener() {
@@ -104,7 +125,7 @@ public class EditPanel extends RefreshablePanel {
 		buttonPanel.add(Box.createHorizontalGlue());
 		buttonPanel.add(btnSave);
 		
-		JButton btnCancel = new JButton("Cancel");
+		JButton btnCancel = new JButton("cancel");
 		btnCancel.setFont(Assets.fontCaviarDreams.deriveFont(Assets.FONT_SIZE_DEFAULT));
 		btnCancel.setFocusPainted(false);
 		btnCancel.addActionListener(new ActionListener() {
@@ -119,6 +140,11 @@ public class EditPanel extends RefreshablePanel {
 		this.add(buttonPanel, BorderLayout.SOUTH);
 	}
 	
+	/**
+	 * Called by the pressing of a "Save Changes" button. Checks to make sure
+	 * the input is valid and prompts the user if it is not. Then saves the changes
+	 * to the file which represents the idea that was originally loaded.
+	 */
 	private void saveIdea() {
 		if (textFieldIdeaName.getText() == null || textFieldIdeaName.getText().length() == 0) {
 			JOptionPane.showMessageDialog(Ideabook.getFrame(), "This idea must have a name.", "No name", JOptionPane.ERROR_MESSAGE);
@@ -171,7 +197,19 @@ public class EditPanel extends RefreshablePanel {
 			Notification.queueInformationNotification("This idea has been successfully saved");
 		}
 	}
+	
+	/**
+	 * Sets the idea which will be edited.
+	 * @param idea the idea to be edited
+	 */
+	public static void setCurrentIdea(Idea idea) {
+		currentIdea = idea;
+	}
 
+	/**
+	 * Sets the input fields to the values provided by <code>currentIdea</code>.
+	 */
+	@Override
 	public void refresh() {
 		if (currentIdea == null) {
 			return;
@@ -183,6 +221,10 @@ public class EditPanel extends RefreshablePanel {
 		textAreaIdeaBody.setText(currentIdea.getBody());
 	}
 	
+	/**
+	 * Fills the text fields with a default value.
+	 */
+	@Override
 	public void close() {
 		textFieldIdeaName.setText(UNAVAILABLE);
 		textFieldIdeaTags.setText(UNAVAILABLE);
@@ -190,11 +232,11 @@ public class EditPanel extends RefreshablePanel {
 		comboIdeaCategory.setSelectedIndex(0);
 	}
 	
+	/**
+	 * Does nothing.
+	 */
+	@Override
 	public void save() {
 		
-	}
-	
-	public static void setCurrentIdea(Idea idea) {
-		currentIdea = idea;
 	}
 }

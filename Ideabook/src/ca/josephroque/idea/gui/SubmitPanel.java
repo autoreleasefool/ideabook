@@ -40,20 +40,41 @@ import ca.josephroque.idea.config.Idea;
 import ca.josephroque.idea.config.Tag;
 import ca.josephroque.idea.gui.components.IdeaCanvas;
 
+/**
+ * <code>RefreshablePanel</code> which the user can use to create
+ * new "ideas" for the application. Ideas can have a name, description,
+ * graphic, category and a list of tags, all of which can be submitted
+ * through input fields, etc. in this menu.
+ * 
+ * @author Joseph Roque
+ * @since 2014-06-01
+ */
 public class SubmitPanel extends RefreshablePanel {
 
+	/** Default serialVersionUID */
 	private static final long serialVersionUID = 1L;
+	/** String which represents the option to create a new category */
 	private static final String STR_CATEGORY_NEW = "New Category...";
-	private static final int CATEGORY_MAX_LENGTH = 16;
 	
+	/** Input field for the idea's name */
 	private JTextField textIdeaName = null;
+	/** Input field for the idea's tags */
 	private JTextField textIdeaTags = null;
+	/** Input field for the idea's description */
 	private JTextArea textAreaIdeaBody = null;
+	/** Drop down list for the idea's category */
 	private JComboBox<String> comboCategory = null;
 	
+	/** The most recently selected index of <code>comboCategory</code> */
 	private int oldSelectedIndex = 0;
+	/** Indicates whether an index change in <code>comboCategory</code> should elicit a prompt or not */
 	private boolean shouldPromptNewCategory = true;
 	
+	/**
+	 * Default constructor. Creates a layout for the input fields and
+	 * drop down lists. Places two buttons at the bottom of the screen
+	 * to cancel or submit the new idea.
+	 */
 	public SubmitPanel() {
 		super();
 		this.setLayout(new BorderLayout());
@@ -138,7 +159,7 @@ public class SubmitPanel extends RefreshablePanel {
 		
 		tabbedPane.addTab("Text", null, new JScrollPane(textAreaIdeaBody), "Plain text to describe the idea");
 		
-		Canvas ideaGraphicsCanvas = new IdeaCanvas();
+		Canvas ideaGraphicsCanvas = new IdeaCanvas(true);
 		tabbedPane.addTab("Graphics", null, ideaGraphicsCanvas, "Visuals to illustrate the idea");
 		
 		lowerConfigPanel.add(tabbedPane, BorderLayout.CENTER);
@@ -147,20 +168,25 @@ public class SubmitPanel extends RefreshablePanel {
 		JPanel controlButtonPanel = new JPanel();
 		controlButtonPanel.setBackground(Assets.backgroundPanelColor);
 		
-		ActionListener controlListener = new ControlActionListener();
-		
 		JButton button = new JButton("create");
 		button.setFont(Assets.fontCaviarDreams.deriveFont(Assets.FONT_SIZE_DEFAULT));
 		button.setFocusPainted(false);
-		button.setActionCommand("Create");
-		button.addActionListener(controlListener);
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				createIdea();
+			}
+		});
 		controlButtonPanel.add(button);
 		
 		button = new JButton("cancel");
 		button.setFont(Assets.fontCaviarDreams.deriveFont(Assets.FONT_SIZE_DEFAULT));
 		button.setFocusPainted(false);
 		button.setActionCommand("Cancel");
-		button.addActionListener(controlListener);
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				cancelIdea();
+			}
+		});
 		controlButtonPanel.add(button);
 		
 		lowerConfigPanel.add(controlButtonPanel, BorderLayout.SOUTH);
@@ -170,6 +196,12 @@ public class SubmitPanel extends RefreshablePanel {
 		lowerConfigPanel = null;
 	}
 	
+	/**
+	 * Prompts the user for a new category name and, if it is a valid name,
+	 * it is created.
+	 * 
+	 * @see ca.josephroque.idea.config.Category#addCategoryName(String, boolean)
+	 */
 	private void promptNewCategory() {
 		String input = null;
 		do {
@@ -177,9 +209,9 @@ public class SubmitPanel extends RefreshablePanel {
 			if (input == null || input.length() == 0)
 				break;
 			input = input.trim();
-			if (input.equalsIgnoreCase("CONFIG")) {
-				Notification.queueInformationNotification("You cannot use " + input + " as a category name");
-			} else if (input.length() > CATEGORY_MAX_LENGTH) {
+			if (input.equalsIgnoreCase("CONFIG") || input.equalsIgnoreCase("Any Category")) {
+				Notification.queueInformationNotification("You cannot use \"" + input + "\" as a category name");
+			} else if (input.length() > Category.CATEGORY_MAX_LENGTH) {
 				Notification.queueInformationNotification("New category names must be 16 characters or less");
 			} else if (!input.matches(Text.regex_AlphaNumeric)) {
 				Notification.queueInformationNotification("Category names must be alphanumeric");
@@ -198,6 +230,11 @@ public class SubmitPanel extends RefreshablePanel {
 		comboCategory.setSelectedIndex(oldSelectedIndex);
 	}
 	
+	/**
+	 * Clears the text fields of any data and resets the list
+	 * of category names.
+	 */
+	@Override
 	public void refresh() {
 		shouldPromptNewCategory = false;
 		String[] categoryNames = Category.getCategoryNamesArray();
@@ -217,10 +254,20 @@ public class SubmitPanel extends RefreshablePanel {
 		shouldPromptNewCategory = true;
 	}
 	
+	/**
+	 * Does nothing.
+	 */
+	@Override
 	public void close() {
 		
 	}
 	
+	/**
+	 * If the user has made any changes and has not saved their idea,
+	 * the data is saved to an XML document which can be discovered
+	 * and reloaded when the application is opened again.
+	 */
+	@Override
 	public void save() {
 		String ideaNameText = textIdeaName.getText().trim();
 		String ideaTagText = textIdeaTags.getText().trim();
@@ -275,55 +322,84 @@ public class SubmitPanel extends RefreshablePanel {
 		}
 	}
 	
-	private class ControlActionListener implements ActionListener {
-		public void actionPerformed(ActionEvent event) {
-			if ("Create".equals(event.getActionCommand())) {
-				textIdeaName.setText(textIdeaName.getText().trim());
-				textAreaIdeaBody.setText(textAreaIdeaBody.getText().trim());
-				textIdeaTags.setText(textIdeaTags.getText().trim());
-				
-				if (textIdeaName.getText() == null || textIdeaName.getText().length() == 0) {
-					JOptionPane.showMessageDialog(Ideabook.getFrame(), "This idea must have a name.", "No name", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				
-				if (textAreaIdeaBody.getText() == null || textAreaIdeaBody.getText().length() == 0) {
-					int checkForBody = JOptionPane.showConfirmDialog(Ideabook.getFrame(), "You have not given this idea a body. A body allows you to elaborate on your idea. Are you sure this is correct?", "No body provided", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-					if (checkForBody == JOptionPane.CANCEL_OPTION || checkForBody == JOptionPane.CLOSED_OPTION)
-						return;
-				}
-				
-				if (textIdeaTags.getText() == null || textIdeaTags.getText().length() == 0) {
-					int checkForTags = JOptionPane.showConfirmDialog(Ideabook.getFrame(), "You have not provided any tags. Providing tags will make this idea much easier to find later. Are you sure this is correct?", "No tags provided", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-					if (checkForTags == JOptionPane.CANCEL_OPTION || checkForTags == JOptionPane.CLOSED_OPTION)
-						return;
-				}
-				
-				createNewIdea();
-			} else if ("Cancel".equals(event.getActionCommand())) {
-				if (textIdeaName.getText().length() > 0 || textIdeaTags.getText().length() > 0 || textAreaIdeaBody.getText().length() > 0) {
-					int confirmCancel = JOptionPane.showConfirmDialog(Ideabook.getFrame(), "By cancelling this submission, you will lose any information entered above. Are you sure you want to do this?", "Warning - Cancelling Submission", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-					if (confirmCancel == JOptionPane.CANCEL_OPTION || confirmCancel == JOptionPane.CLOSED_OPTION)
-						return;
-				}
-				
-				PanelManager.show(PanelManager.MENU_MAIN);
-			}
+	/**
+	 * Ensures the data in the input fields is valid, then attempts to
+	 * create a new Idea and save it to a file.
+	 * 
+	 * @see ca.josephroque.idea.gui.SubmitPanel#createNewIdea()
+	 */
+	private void createIdea() {
+		textIdeaName.setText(textIdeaName.getText().trim());
+		textAreaIdeaBody.setText(textAreaIdeaBody.getText().trim());
+		textIdeaTags.setText(textIdeaTags.getText().trim());
+		
+		if (textIdeaName.getText() == null || textIdeaName.getText().length() == 0) {
+			JOptionPane.showMessageDialog(Ideabook.getFrame(), "This idea must have a name.", "No name", JOptionPane.ERROR_MESSAGE);
+			return;
 		}
+		
+		if (textAreaIdeaBody.getText() == null || textAreaIdeaBody.getText().length() == 0) {
+			int checkForBody = JOptionPane.showConfirmDialog(Ideabook.getFrame(), "You have not given this idea a body. A body allows you to elaborate on your idea. Are you sure this is correct?", "No body provided", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+			if (checkForBody == JOptionPane.CANCEL_OPTION || checkForBody == JOptionPane.CLOSED_OPTION)
+				return;
+		}
+		
+		if (textIdeaTags.getText() == null || textIdeaTags.getText().length() == 0) {
+			int checkForTags = JOptionPane.showConfirmDialog(Ideabook.getFrame(), "You have not provided any tags. Providing tags will make this idea much easier to find later. Are you sure this is correct?", "No tags provided", JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
+			if (checkForTags == JOptionPane.CANCEL_OPTION || checkForTags == JOptionPane.CLOSED_OPTION)
+				return;
+		}
+		
+		createNewIdea();
 	}
 	
+	/**
+	 * Checks for any input in the text fields. If there is any, the user is prompted
+	 * to stay on the page. If not, the user is returned to the main menu.
+	 */
+	private void cancelIdea() {
+		if (textIdeaName.getText().length() > 0 || textIdeaTags.getText().length() > 0 || textAreaIdeaBody.getText().length() > 0) {
+			int confirmCancel = JOptionPane.showConfirmDialog(Ideabook.getFrame(), "By cancelling this submission, you will lose any information entered above. Are you sure you want to do this?", "Warning - Cancelling Submission", JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+			if (confirmCancel == JOptionPane.CANCEL_OPTION || confirmCancel == JOptionPane.CLOSED_OPTION)
+				return;
+		}
+		
+		PanelManager.show(PanelManager.MENU_MAIN);
+	}
+	
+	/**
+	 * Sets the text in <code>textIdeaName</code> to <code>name</code>,
+	 * 
+	 * @param name the input for <code>textIdeaName<code>
+	 */
 	public void setIdeaName(String name) {
 		this.textIdeaName.setText(name);
 	}
 	
+	/**
+	 * Sets the text in <code>textIdeaTags</code> to <code>tags</code>.
+	 * 
+	 * @param tags the input for <code>textIdeaTags</code>
+	 */
 	public void setIdeaTags(String tags) {
 		this.textIdeaTags.setText(tags);
 	}
 	
+	/**
+	 * Sets the text in <code>textAreaIdeaBody</code> to <code>body</code>.
+	 * 
+	 * @param body the input for <code>textAreaIdeaBody</code>
+	 */
 	public void setIdeaBody(String body) {
 		this.textAreaIdeaBody.setText(body);
 	}
 	
+	/**
+	 * Attempts to create a new {@link ca.josephroque.idea.config.Idea} object from
+	 * the input provided by the user and save it to a file.
+	 * 
+	 * @see ca.josephroque.idea.config.Idea#saveIdea(Idea)
+	 */
 	private void createNewIdea() {
 		Idea newIdea = new Idea(textIdeaName.getText(), comboCategory.getItemAt(comboCategory.getSelectedIndex()), textAreaIdeaBody.getText(), textIdeaTags.getText().split(", *"), new java.util.Date());
 		
