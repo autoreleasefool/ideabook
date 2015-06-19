@@ -1,0 +1,54 @@
+*.pydevproject
+Ideabook/.metadata
+Ideabook/.gradle
+Ideabook/bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+Ideabook/local.properties
+Ideabook/.settings/
+Ideabook/.loadpath
+
+# Eclipse Core
+Ideabook/.project
+
+# External tool builders
+Ideabook/.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# CDT-specific
+Ideabook/.cproject
+
+# JDT-specific (Eclipse Java Development Tools)
+Ideabook/.classpath
+
+# Java annotation processor (APT)
+Ideabook/.factorypath
+
+# PDT-specific
+Ideabook/.buildpath
+
+# sbteclipse plugin
+Ideabook/.target
+
+# TeXlipse plugin
+Ideabook/.texlipse
+
+*.class
+
+# Mobile Tools for Java (J2ME)
+Ideabook/.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+*.DS_STORE
